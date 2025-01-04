@@ -1,3 +1,6 @@
 ETTm1_96_96_S_Mamba_ETTm1_M_ft96_sl48_ll96_pl256_dm8_nh2_el1_dl256_df1_fctimeF_ebTrue_dtExp_projection_0  
 mse:0.3312532603740692, mae:0.3677285313606262
 
+ETTm1_96_96_S_Mamba_ETTm1_M_ft96_sl48_ll96_pl256_dm8_nh2_el1_dl256_df1_fctimeF_ebTrue_dtExp_projection_0  
+mse:0.3312530219554901, mae:0.36772844195365906
+

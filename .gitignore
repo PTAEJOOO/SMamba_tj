@@ -2,5 +2,5 @@ dataset/
 *.pyc
 *.pdf
 *.npy
-tsdm-main/
+tsdm_main/
 ex1.py
