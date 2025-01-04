@@ -1,1 +1,7 @@
+data/
 dataset/
+*.pyc
+*.pdf
+*.npy
+tsdm-main/
+ex1.py
