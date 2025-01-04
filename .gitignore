@@ -1,1 +1,7 @@
 dataset/
+*.pyc
+*.pdf
+tsdm-main/
+*.npy
+*.pt
+*.csv
