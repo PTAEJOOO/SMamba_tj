@@ -1,6 +1,7 @@
 import random
 
 from data_provider.data_factory import data_provider
+from data_provider.imts_data_factory import imts_data_provider
 from experiments.exp_basic import Exp_Basic
 from utils.tools import EarlyStopping, adjust_learning_rate, visual
 from utils.metrics import metric
@@ -11,6 +12,7 @@ import os
 import time
 import warnings
 import numpy as np
+import sys
 
 warnings.filterwarnings('ignore')
 
@@ -30,6 +32,10 @@ class Exp_Long_Term_Forecast(Exp_Basic):
         data_set, data_loader = data_provider(self.args, flag)
         return data_set, data_loader
 
+    def _get_imts_data(self):
+        train_loader, vali_loader, test_loader = imts_data_provider(self.args)
+        return train_loader, vali_loader, test_loader
+
     def _select_optimizer(self):
         model_optim = optim.Adam(self.model.parameters(), lr=self.args.learning_rate)
         return model_optim
@@ -38,7 +44,7 @@ class Exp_Long_Term_Forecast(Exp_Basic):
         criterion = nn.MSELoss()
         return criterion
 
-    def vali(self, vali_data, vali_loader, criterion):
+    def vali(self, vali_loader, criterion):
         total_loss = []
         self.model.eval()
         with torch.no_grad():
@@ -83,9 +89,12 @@ class Exp_Long_Term_Forecast(Exp_Basic):
         return total_loss
 
     def train(self, setting):
-        train_data, train_loader = self._get_data(flag='train')
-        vali_data, vali_loader = self._get_data(flag='val')
-        test_data, test_loader = self._get_data(flag='test')
+        if self.args.data in {'ushcn', 'mimiciii', 'mimiciv', 'physionet2012'}:
+            train_loader, vali_loader, test_loader = self._get_imts_data()
+        else:
+            train_data, train_loader = self._get_data(flag='train')
+            vali_data, vali_loader = self._get_data(flag='val')
+            test_data, test_loader = self._get_data(flag='test')
 
         path = os.path.join(self.args.checkpoints, setting)
         if not os.path.exists(path):
@@ -174,8 +183,8 @@ class Exp_Long_Term_Forecast(Exp_Basic):
 
             print("Epoch: {} cost time: {}".format(epoch + 1, time.time() - epoch_time))
             train_loss = np.average(train_loss)
-            vali_loss = self.vali(vali_data, vali_loader, criterion)
-            test_loss = self.vali(test_data, test_loader, criterion)
+            vali_loss = self.vali(vali_loader, criterion)
+            test_loss = self.vali(test_loader, criterion)
 
             print("Epoch: {0}, Steps: {1} | Train Loss: {2:.7f} Vali Loss: {3:.7f} Test Loss: {4:.7f}".format(
                 epoch + 1, train_steps, train_loss, vali_loss, test_loss))
