@@ -2,6 +2,7 @@ import torch
 from torch import Tensor
 from typing import NamedTuple
 from torch.nn.utils.rnn import pad_sequence
+from torch.utils.data import Dataset
 
 class Batch(NamedTuple):
     r"""A single sample of the data."""
@@ -91,3 +92,25 @@ def tsdm_collate(batch: list[Sample]) -> Batch:
         y_vals=pad_sequence(target_vals, batch_first=True, padding_value=0).squeeze(),
         y_mask=pad_sequence(target_mask, batch_first=True).squeeze(),
     )
+
+class CustomDataset(Dataset):
+    def __init__(self, T, X, M, TY, Y, MY):
+        self.T = T
+        self.X = X
+        self.M = M
+        self.TY = TY
+        self.Y = Y
+        self.MY = MY
+
+    def __len__(self):
+        return self.T.shape[0]
+
+    def __getitem__(self, idx):
+        return Batch(
+            x_time=self.T[idx],
+            x_vals=self.X[idx],
+            x_mask=self.M[idx],
+            y_time=self.TY[idx],
+            y_vals=self.Y[idx],
+            y_mask=self.MY[idx],
+        )
