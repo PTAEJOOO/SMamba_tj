@@ -17,7 +17,7 @@ class Model(nn.Module):
         self.use_norm = configs.use_norm
         # Embedding
         self.enc_embedding = DataEmbedding_inverted(configs.seq_len, configs.d_model, configs.embed, configs.freq,
-                                                    configs.dropout)
+                                                    configs.dropout) # c_in = configs.seq_len, d_model = configs.d_model
         self.class_strategy = configs.class_strategy
         # Encoder-only architecture
         self.encoder = Encoder(
@@ -74,7 +74,6 @@ class Model(nn.Module):
         # Embedding
         # B L N -> B N E                (B L N -> B L E in the vanilla Transformer)
         enc_out = self.enc_embedding(x_enc, x_mark_enc) # covariates (e.g timestamp) can be also embedded as tokens
-        
         # B N E -> B N E                (B L E -> B L E in the vanilla Transformer)
         # the dimensions of embedded time series has been inverted, and then processed by native attn, layernorm and ffn modules
         enc_out, attns = self.encoder(enc_out, attn_mask=None)
