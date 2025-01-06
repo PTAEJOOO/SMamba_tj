@@ -2,6 +2,7 @@ import argparse
 import torch
 from experiments.exp_long_term_forecasting import Exp_Long_Term_Forecast
 from experiments.exp_long_term_forecasting_partial import Exp_Long_Term_Forecast_Partial
+from experiments.exp_imts import Exp_IMTS_Forecast
 import random
 import numpy as np
 
@@ -108,8 +109,8 @@ if __name__ == '__main__':
 
     if args.exp_name == 'partial_train': # See Figure 8 of our paper, for the detail
         Exp = Exp_Long_Term_Forecast_Partial
-    else: # MTSF: multivariate time series forecasting
-        Exp = Exp_Long_Term_Forecast
+    else: # IMTS Forecast
+        Exp = Exp_IMTS_Forecast
     import torch.multiprocessing
 
     torch.multiprocessing.set_sharing_strategy('file_system')
@@ -143,9 +144,9 @@ if __name__ == '__main__':
             print('>>>>>>>testing : {}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.format(setting))
             exp.test(setting)
 
-            if args.do_predict:
-                print('>>>>>>>predicting : {}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.format(setting))
-                exp.predict(setting, True)
+            # if args.do_predict:
+            #     print('>>>>>>>predicting : {}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.format(setting))
+            #     exp.predict(setting, True)
 
             torch.cuda.empty_cache()
     elif args.is_training == 2:
