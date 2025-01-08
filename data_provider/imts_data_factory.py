@@ -11,6 +11,10 @@ from tsdm.tasks.mimic_iii_debrouwer2019 import MIMIC_III_DeBrouwer2019
 from tsdm.tasks.mimic_iv_bilos2021 import MIMIC_IV_Bilos2021
 from tsdm.tasks.physionet2012 import Physionet2012
 
+##
+import lib.utils as utils
+from lib.physionet import *
+
 imts_data_dict = {
     'ushcn': USHCN_DeBrouwer2019,
     'mimiciii': MIMIC_III_DeBrouwer2019,
@@ -25,76 +29,32 @@ def imts_data_provider(args, flag):
 
     if flag == 'train':
         dloader_config = {
-            "batch_size": 8128,
+            "batch_size": args.batch_size,
             "shuffle": True,
             "drop_last": True,
             "pin_memory": True,
             "num_workers": 1,
-            "collate_fn": tsdm_collate,
+            "collate_fn": patch_variable_time_collate_fn,
         }
     elif flag == 'val':
         dloader_config = {
-            "batch_size": 2037,
+            "batch_size": args.batch_size,
             "shuffle": False,
             "drop_last": False,
             "pin_memory": True,
             "num_workers": 0,
-            "collate_fn": tsdm_collate,
+            "collate_fn": patch_variable_time_collate_fn,
         }
     else:
         dloader_config = {
-            "batch_size": 1798,
+            "batch_size": args.batch_size,
             "shuffle": False,
             "drop_last": False,
             "pin_memory": True,
             "num_workers": 0,
-            "collate_fn": tsdm_collate,
+            "collate_fn": patch_variable_time_collate_fn,
         }
 
     data_loader = TASK.get_dataloader((0, "train"), **dloader_config)
 
-    DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-    for _, batch in enumerate(data_loader):
-        x_time, x_vals, x_mask, y_time, y_vals, y_mask = (tensor.to(DEVICE) for tensor in batch)
-
-        x_time = x_time[:,:args.seq_len].unsqueeze(-1)
-        x_vals = x_vals[:,:args.seq_len,:]
-        x_mask = x_mask[:,:args.seq_len,:]
-
-        y_time = y_time[:,args.seq_len:].unsqueeze(-1)
-        y_vals = y_vals[:,args.seq_len:,:]
-        y_mask = y_mask[:,args.seq_len:,:]
-
-        new_dataset = CustomDataset(x_time,x_vals,x_mask,y_time,y_vals,y_mask)
-        new_data_loader = DataLoader(new_dataset, batch_size=args.batch_size, shuffle=True)
-
-    # for _, batch in enumerate(vali_loader):
-    #     x_time, x_vals, x_mask, y_time, y_vals, y_mask = (tensor.to(DEVICE) for tensor in batch)
-
-    #     x_time = x_time[:,:args.seq_len].unsqueeze(-1)
-    #     x_vals = x_vals[:,:args.seq_len,:]
-    #     x_mask = x_mask[:,:args.seq_len,:]
-
-    #     y_time = y_time[:,args.seq_len:].unsqueeze(-1)
-    #     y_vals = y_vals[:,args.seq_len:,:]
-    #     y_mask = y_mask[:,args.seq_len:,:]
-
-    #     new_dataset = CustomDataset(x_time,x_vals,x_mask,y_time,y_vals,y_mask)
-    #     new_vali_loader = DataLoader(new_dataset, batch_size=args.batch_size, shuffle=True)
-
-    # for _, batch in enumerate(test_loader):
-    #     x_time, x_vals, x_mask, y_time, y_vals, y_mask = (tensor.to(DEVICE) for tensor in batch)
-
-    #     x_time = x_time[:,:args.seq_len].unsqueeze(-1)
-    #     x_vals = x_vals[:,:args.seq_len,:]
-    #     x_mask = x_mask[:,:args.seq_len,:]
-
-    #     y_time = y_time[:,args.seq_len:].unsqueeze(-1)
-    #     y_vals = y_vals[:,args.seq_len:,:]
-    #     y_mask = y_mask[:,args.seq_len:,:]
-
-    #     new_dataset = CustomDataset(x_time,x_vals,x_mask,y_time,y_vals,y_mask)
-    #     new_test_loader = DataLoader(new_dataset, batch_size=args.batch_size, shuffle=True)
-
-    return new_data_loader
+    return data_loader

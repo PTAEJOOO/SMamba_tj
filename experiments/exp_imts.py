@@ -16,11 +16,19 @@ import warnings
 import numpy as np
 import sys
 
+from lib.parse_datasets import parse_datasets
+import lib.utils as utils
+from lib.evaluation import *
+
 warnings.filterwarnings('ignore')
 
 class Exp_IMTS_Forecast(Exp_Basic):
     def __init__(self, args):
         super(Exp_IMTS_Forecast, self).__init__(args)
+        self.data_obj = None
+        self.train_dataloader = None
+        self.val_dataloader = None
+        self.test_dataloader = None
 
     def _build_model(self):
         model = self.model_dict[self.args.model].Model(self.args).float()
@@ -53,10 +61,18 @@ class Exp_IMTS_Forecast(Exp_Basic):
         return mse(y,yhat,mask),mae(y,yhat,mask),rmse(y,yhat,mask)
 
     def vali(self, vali_loader, criterion):
+        num_batches = self.data_obj["n_val_batches"]
+
         total_loss = []
         self.model.eval()
         with torch.no_grad():
-            for i, (batch_x_mark, batch_x, batch_x_mask, batch_y_mark, batch_y, batch_y_mask) in enumerate(vali_loader):
+            for i, batch_dict in enumerate(vali_loader):
+                batch_x_mark = batch_dict["observed_tp"]
+                batch_x = batch_dict["observed_data"]
+                batch_x_mask = batch_dict["observed_mask"]
+                batch_y_mark = batch_dict["tp_to_predict"]
+                batch_y = batch_dict["data_to_predict"]
+                batch_y_mask = batch_dict["mask_predicted_data"]
                 batch_x = batch_x.float().to(self.device)
                 batch_y = batch_y.float()
 
@@ -74,14 +90,14 @@ class Exp_IMTS_Forecast(Exp_Basic):
                 if self.args.use_amp:
                     with torch.cuda.amp.autocast():
                         if self.args.output_attention:
-                            outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)[0]
+                            outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark, batch_x_mask)[0]
                         else:
-                            outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)
+                            outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark, batch_x_mask)
                 else:
                     if self.args.output_attention:
-                        outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)[0]
+                        outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark, batch_x_mask)[0]
                     else:
-                        outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)
+                        outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark, batch_x_mask)
                 f_dim = -1 if self.args.features == 'MS' else 0
                 outputs = outputs[:, -self.args.pred_len:, f_dim:]
                 batch_y = batch_y[:, -self.args.pred_len:, f_dim:].to(self.device)
@@ -98,9 +114,13 @@ class Exp_IMTS_Forecast(Exp_Basic):
         return total_loss
 
     def train(self, setting):
-        train_loader = self._get_imts_data(flag='train')
-        vali_loader = self._get_imts_data(flag='val')
-        test_loader = self._get_imts_data(flag='test')
+        # train_loader = self._get_imts_data(flag='train')
+        # vali_loader = self._get_imts_data(flag='val')
+        # test_loader = self._get_imts_data(flag='test')
+        self.data_obj = parse_datasets(self.args, patch_ts=True)
+        self.train_loader = self.data_obj['train_dataloader']
+        self.vali_loader = self.data_obj['val_dataloader']
+        self.test_loader = self.data_obj['test_dataloader']
 
         path = os.path.join(self.args.checkpoints, setting)
         if not os.path.exists(path):
@@ -108,7 +128,9 @@ class Exp_IMTS_Forecast(Exp_Basic):
 
         time_now = time.time()
 
-        train_steps = len(train_loader)
+        train_steps = len(self.train_loader)
+        num_batches = self.data_obj["n_train_batches"]
+
         early_stopping = EarlyStopping(patience=self.args.patience, verbose=True)
 
         model_optim = self._select_optimizer()
@@ -123,10 +145,14 @@ class Exp_IMTS_Forecast(Exp_Basic):
 
             self.model.train()
             epoch_time = time.time()
-            for i, (batch_x_mark, batch_x, batch_x_mask, batch_y_mark, batch_y, batch_y_mask) in enumerate(train_loader):
-                # T, X, M, TY, Y, MY
-                iter_count += 1
-                model_optim.zero_grad()
+            for i, batch_dict in enumerate(self.train_loader):
+                batch_x_mark = batch_dict["observed_tp"]
+                batch_x = batch_dict["observed_data"]
+                batch_x_mask = batch_dict["observed_mask"]
+                batch_y_mark = batch_dict["tp_to_predict"]
+                batch_y = batch_dict["data_to_predict"]
+                batch_y_mask = batch_dict["mask_predicted_data"]
+            
                 batch_x = batch_x.float().to(self.device)
                 batch_y = batch_y.float().to(self.device)
                 if 'PEMS' in self.args.data or 'Solar' in self.args.data:
@@ -144,20 +170,20 @@ class Exp_IMTS_Forecast(Exp_Basic):
                 if self.args.use_amp:
                     with torch.cuda.amp.autocast():
                         if self.args.output_attention:
-                            outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)[0]
+                            outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark, batch_x_mask)[0]
                         else:
-                            outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)
+                            outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark, batch_x_mask)
 
                         f_dim = -1 if self.args.features == 'MS' else 0
-                        outputs = outputs[:, -self.args.pred_len:, f_dim:]
-                        batch_y = batch_y[:, -self.args.pred_len:, f_dim:].to(self.device)
+                        # outputs = outputs[:, -self.args.pred_len:, f_dim:]
+                        # batch_y = batch_y[:, -self.args.pred_len:, f_dim:].to(self.device)
                         loss = criterion(batch_y, outputs, batch_y_mask.to(torch.bool))
                         train_loss.append(loss.item())
                 else:
                     if self.args.output_attention:
-                        outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)[0]
+                        outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark, batch_x_mask)[0]
                     else:
-                        outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)
+                        outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark, batch_x_mask)
 
                     f_dim = -1 if self.args.features == 'MS' else 0
                     outputs = outputs[:, -self.args.pred_len:, f_dim:]
@@ -190,8 +216,8 @@ class Exp_IMTS_Forecast(Exp_Basic):
 
             print("Epoch: {} cost time: {}".format(epoch + 1, time.time() - epoch_time))
             train_loss = np.average(train_loss)
-            vali_loss = self.vali(vali_loader, criterion)
-            test_loss = self.vali(test_loader, criterion)
+            vali_loss = self.vali(self.vali_loader, criterion)
+            test_loss = self.vali(self.test_loader, criterion)
 
             print("Epoch: {0}, Steps: {1} | Train Loss: {2:.7f} Vali Loss: {3:.7f} Test Loss: {4:.7f}".format(
                 epoch + 1, train_steps, train_loss, vali_loss, test_loss))
@@ -210,7 +236,7 @@ class Exp_IMTS_Forecast(Exp_Basic):
         return self.model
 
     def test(self, setting, test=0):
-        test_loader = self._get_imts_data(flag='test')
+        # test_loader = self._get_imts_data(flag='test')
         if test:
             print('loading model')
             self.model.load_state_dict(torch.load(os.path.join('./checkpoints/' + setting, 'checkpoint.pth')))
@@ -226,7 +252,15 @@ class Exp_IMTS_Forecast(Exp_Basic):
 
         self.model.eval()
         with torch.no_grad():
-            for i, (batch_x_mark, batch_x, batch_x_mask, batch_y_mark, batch_y, batch_y_mask) in enumerate(test_loader):
+            for i, batch_dict in enumerate(self.test_loader):
+                ##
+                batch_x_mark = batch_dict["observed_tp"]
+                batch_x = batch_dict["observed_data"]
+                batch_x_mask = batch_dict["observed_mask"]
+                batch_y_mark = batch_dict["tp_to_predict"]
+                batch_y = batch_dict["data_to_predict"]
+                batch_y_mask = batch_dict["mask_predicted_data"]
+                ##
                 batch_x = batch_x.float().to(self.device)
                 batch_y = batch_y.float().to(self.device)
                 # time_points = random.sample(range(batch_x.size()[1]), 5)
@@ -255,19 +289,19 @@ class Exp_IMTS_Forecast(Exp_Basic):
                 if self.args.use_amp:
                     with torch.cuda.amp.autocast():
                         if self.args.output_attention:
-                            outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)[0]
+                            outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark, batch_x_mask)[0]
                         else:
-                            outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)
+                            outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark, batch_x_mask)
                 else:
                     if self.args.output_attention:
-                        outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)[0]
+                        outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark, batch_x_mask)[0]
 
                     else:
-                        outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)
+                        outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark, batch_x_mask)
 
                 f_dim = -1 if self.args.features == 'MS' else 0
-                outputs = outputs[:, -self.args.pred_len:, f_dim:]
-                batch_y = batch_y[:, -self.args.pred_len:, f_dim:].to(self.device)
+                # outputs = outputs[:, -self.args.pred_len:, f_dim:]
+                # batch_y = batch_y[:, -self.args.pred_len:, f_dim:].to(self.device)
                 outputs = outputs.detach().cpu()
                 batch_y = batch_y.detach().cpu()
                 batch_y_mask = batch_y_mask.detach().cpu()

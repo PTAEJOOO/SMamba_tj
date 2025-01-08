@@ -32,9 +32,6 @@ if __name__ == '__main__':
     parser.add_argument('--checkpoints', type=str, default='./checkpoints/', help='location of model checkpoints')
 
     # IMTS
-    # parser.add_argument("-dset", "--dataset", default="ushcn", type=str, help="Name of the dataset")
-    # parser.add_argument("-ft", "--forc-time", default=0, type=int, help="forecast horizon in hours")
-    # parser.add_argument("-ct", "--cond-time", default=36, type=int, help="conditioning range in hours")
     parser.add_argument("-nf", "--nfolds", default=5, type=int, help="#folds for crossvalidation")
 
     # forecasting task
