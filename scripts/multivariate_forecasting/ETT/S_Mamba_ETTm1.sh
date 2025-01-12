@@ -21,7 +21,7 @@ python -u run.py \
   --d_state 2 \
   --learning_rate 0.00005 \
   --d_ff 256 \
-  --itr 1
+  --itr 10
 
 # python -u run.py \
 #   --is_training 1 \
