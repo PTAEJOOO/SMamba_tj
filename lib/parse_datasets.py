@@ -66,12 +66,12 @@ def parse_datasets(args, patch_ts=False, length_stat=False):
 				data_min = data_min, data_max = data_max, time_max = time_max))
 
 		data_objects = {
-					"train_dataloader": utils.inf_generator(train_dataloader), 
-					"val_dataloader": utils.inf_generator(val_dataloader),
-					"test_dataloader": utils.inf_generator(test_dataloader),
-					# "train_dataloader": train_dataloader, 
-					# "val_dataloader": val_dataloader,
-					# "test_dataloader": test_dataloader,
+					# "train_dataloader": utils.inf_generator(train_dataloader), 
+					# "val_dataloader": utils.inf_generator(val_dataloader),
+					# "test_dataloader": utils.inf_generator(test_dataloader),
+					"train_dataloader": train_dataloader, 
+					"val_dataloader": val_dataloader,
+					"test_dataloader": test_dataloader,
 					"input_dim": input_dim,
 					"n_train_batches": len(train_dataloader),
 					"n_val_batches": len(val_dataloader),

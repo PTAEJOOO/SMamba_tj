@@ -8,8 +8,8 @@ python -u run_imts.py \
   --model $model_name \
   --data physionet2012 \
   --features M \
-  --seq_len 36 \
-  --pred_len 12 \
+  --seq_len 24 \
+  --pred_len 24 \
   --e_layers 2 \
   --enc_in 7 \
   --dec_in 7 \

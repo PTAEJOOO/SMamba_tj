@@ -8,9 +8,16 @@ import numpy as np
 
 if __name__ == '__main__':
     fix_seed = 2023
-    random.seed(fix_seed)
+    # random.seed(fix_seed)
+    # torch.manual_seed(fix_seed)
+    # np.random.seed(fix_seed)
     torch.manual_seed(fix_seed)
+    torch.cuda.manual_seed(fix_seed)
+    torch.cuda.manual_seed_all(fix_seed)
     np.random.seed(fix_seed)
+    random.seed(fix_seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
 
     parser = argparse.ArgumentParser(description='iTransformer')
 

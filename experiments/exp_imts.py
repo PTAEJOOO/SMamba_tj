@@ -99,8 +99,8 @@ class Exp_IMTS_Forecast(Exp_Basic):
                     else:
                         outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark, batch_x_mask)
                 f_dim = -1 if self.args.features == 'MS' else 0
-                outputs = outputs[:, -self.args.pred_len:, f_dim:]
-                batch_y = batch_y[:, -self.args.pred_len:, f_dim:].to(self.device)
+                # outputs = outputs[:, -self.args.pred_len:, f_dim:]
+                # batch_y = batch_y[:, -self.args.pred_len:, f_dim:].to(self.device)
 
                 pred = outputs.detach().cpu()
                 true = batch_y.detach().cpu()
@@ -146,6 +146,7 @@ class Exp_IMTS_Forecast(Exp_Basic):
             self.model.train()
             epoch_time = time.time()
             for i, batch_dict in enumerate(self.train_loader):
+                iter_count += 1
                 batch_x_mark = batch_dict["observed_tp"]
                 batch_x = batch_dict["observed_data"]
                 batch_x_mask = batch_dict["observed_mask"]
@@ -186,8 +187,8 @@ class Exp_IMTS_Forecast(Exp_Basic):
                         outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark, batch_x_mask)
 
                     f_dim = -1 if self.args.features == 'MS' else 0
-                    outputs = outputs[:, -self.args.pred_len:, f_dim:]
-                    batch_y = batch_y[:, -self.args.pred_len:, f_dim:].to(self.device)
+                    # outputs = outputs[:, -self.args.pred_len:, f_dim:]
+                    # batch_y = batch_y[:, -self.args.pred_len:, f_dim:].to(self.device)
                     loss = criterion(batch_y, outputs, batch_y_mask.to(torch.bool))
                     train_loss.append(loss.item())
 
