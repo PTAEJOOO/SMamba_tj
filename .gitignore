@@ -5,3 +5,4 @@ tsdm-main/
 *.npy
 *.pt
 *.csv
+ex2.py
