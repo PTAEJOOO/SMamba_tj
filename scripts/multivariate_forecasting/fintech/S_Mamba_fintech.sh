@@ -4,8 +4,7 @@ model_name=S_Mamba
 # d state 2
 python run.py \
     --is_training 1 \
-    --task_name forecasting \
-    --root_path ./datasets/CryptoTx/ \
+    --root_path ./dataset/CryptoTx/ \
     --data_path bitcoin_ethereum_transactions.csv \
     --data crypto \
     --model_id CryptoTx_96_96 \
