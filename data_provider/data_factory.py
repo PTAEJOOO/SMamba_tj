@@ -10,6 +10,7 @@ data_dict = {
     'Solar': Dataset_Solar,
     'PEMS': Dataset_PEMS,
     'custom': Dataset_Custom,
+    'crypto': Dataset_Custom,
 }
 
 
