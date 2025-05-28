@@ -44,19 +44,6 @@ class Model(nn.Module):
             norm_layer=torch.nn.LayerNorm(configs.d_model)
         )
         self.projector = nn.Linear(configs.d_model, configs.pred_len, bias=True)
-    # a = self.get_parameter_number()
-    #
-    # def get_parameter_number(self):
-    #     """
-    #     Number of model parameters (without stable diffusion)
-    #     """
-    #     total_num = sum(p.numel() for p in self.parameters())
-    #     trainable_num = sum(p.numel() for p in self.parameters() if p.requires_grad)
-    #     trainable_ratio = trainable_num / total_num
-    #
-    #     print('total_num:', total_num)
-    #     print('trainable_num:', total_num)
-    #     print('trainable_ratio:', trainable_ratio)
 
     def forecast(self, x_enc, x_mark_enc, x_dec, x_mark_dec):
         if self.use_norm:
