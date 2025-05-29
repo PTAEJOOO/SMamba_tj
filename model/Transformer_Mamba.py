@@ -79,8 +79,8 @@ class Model(nn.Module):
     def forecast(self, x_enc, x_mark_enc, x_dec, x_mark_dec):
         # Embedding
         enc_out = self.enc_embedding(x_enc, x_mark_enc)
-        enc_out, attns = self.encoder(enc_out, attn_mask=None)
-        # enc_out = self.mamba(enc_out)
+        # enc_out, attns = self.encoder(enc_out, attn_mask=None)
+        enc_out = self.mamba(enc_out)
         dec_out = self.dec_embedding(x_dec, x_mark_dec)
         dec_out = self.decoder(dec_out, enc_out, x_mask=None, cross_mask=None)
         return dec_out
