@@ -88,6 +88,18 @@ if __name__ == '__main__':
                                                                            'you can select [partial_start_index, min(enc_in + partial_start_index, N)]')
     parser.add_argument('--d_state', type=int, default=32, help='parameter of Mamba Block')
 
+    # DLinear
+    parser.add_argument('--individual', action='store_true', default=False, help='DLinear: a linear layer for each variate(channel) individually')
+
+    # TimeMachine
+    parser.add_argument('--revin', type=int, default=1, help='RevIN; True 1 False 0')
+    parser.add_argument('--ch_ind', type=int, default=1, help='Channel Independence; True 1 False 0')
+    parser.add_argument('--residual', type=int, default=1, help='Residual Connection; True 1 False 0')
+    parser.add_argument('--n1',type=int,default=256,help='First Embedded representation')
+    parser.add_argument('--n2',type=int,default=128,help='Second Embedded representation')
+    parser.add_argument('--dconv', type=int, default=2, help='d_conv parameter of Mamba')
+    parser.add_argument('--e_fact', type=int, default=1, help='expand factor parameter of Mamba')
+
     args = parser.parse_args()
     args.use_gpu = True if torch.cuda.is_available() and args.use_gpu else False
 

@@ -31,7 +31,7 @@ python run.py \
     --root_path ./dataset/CryptoTx/ \
     --data_path bitcoin_ethereum_transactions.csv \
     --data crypto \
-    --model_id CryptoTx_96_96 \
+    --model_id CryptoTx_96_24 \
     --model $model_name \
     --features M \
     --target transactions_bitcoin \
@@ -55,7 +55,7 @@ python run.py \
     --root_path ./dataset/CryptoTx/ \
     --data_path bitcoin_ethereum_transactions.csv \
     --data crypto \
-    --model_id CryptoTx_96_96 \
+    --model_id CryptoTx_96_48 \
     --model $model_name \
     --features M \
     --target transactions_bitcoin \

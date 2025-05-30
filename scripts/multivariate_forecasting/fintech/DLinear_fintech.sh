@@ -1,6 +1,6 @@
 export CUDA_VISIBLE_DEVICES=0
 
-model_name=S_Mamba
+model_name=DLinear
 # d state 2
 python run.py \
     --is_training 1 \
