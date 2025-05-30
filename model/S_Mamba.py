@@ -4,6 +4,8 @@ from layers.Mamba_EncDec import Encoder, EncoderLayer
 from layers.Embed import DataEmbedding_inverted
 
 from mamba_ssm import Mamba
+import sys
+
 class Model(nn.Module):
     """
     Paper link: https://arxiv.org/abs/2310.06625

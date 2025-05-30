@@ -11,6 +11,7 @@ import os
 import time
 import warnings
 import numpy as np
+import sys
 
 warnings.filterwarnings('ignore')
 
@@ -36,6 +37,7 @@ class Exp_Long_Term_Forecast(Exp_Basic):
 
     def _select_criterion(self):
         criterion = nn.MSELoss()
+        # criterion = nn.L1Loss()
         return criterion
 
     def vali(self, vali_data, vali_loader, criterion):
@@ -266,9 +268,17 @@ class Exp_Long_Term_Forecast(Exp_Basic):
                     if test_data.scale and self.args.inverse:
                         shape = input.shape
                         input = test_data.inverse_transform(input.squeeze(0)).reshape(shape)
+                    # gt = np.concatenate((input[0, :, -1], true[0, :, -1]), axis=0)
+                    # pd = np.concatenate((input[0, :, -1], pred[0, :, -1]), axis=0)
+                    # visual(gt, pd, os.path.join(folder_path, str(i) + '.pdf'))
+                    ###################################################################
                     gt = np.concatenate((input[0, :, -1], true[0, :, -1]), axis=0)
                     pd = np.concatenate((input[0, :, -1], pred[0, :, -1]), axis=0)
-                    visual(gt, pd, os.path.join(folder_path, str(i) + '.pdf'))
+                    visual(gt, pd, os.path.join(folder_path, str(i) + '_ethereum.pdf'))
+                    gt = np.concatenate((input[0, :, -2], true[0, :, -2]), axis=0)
+                    pd = np.concatenate((input[0, :, -2], pred[0, :, -2]), axis=0)
+                    visual(gt, pd, os.path.join(folder_path, str(i) + '_bitcoin.pdf'))
+                    ###################################################################
 
         preds = np.array(preds)
         trues = np.array(trues)

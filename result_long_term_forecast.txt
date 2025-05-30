@@ -76,3 +76,15 @@ mse:2.3956491947174072, mae:0.9302476048469543
 CryptoTx_96_96_S_Mamba_crypto_M_ft96_sl48_ll96_pl256_dm8_nh2_el1_dl256_df1_fctimeF_ebTrue_dtExp_projection_0  
 mse:3.278778076171875, mae:1.0984057188034058
 
+CryptoTx_96_12_S_Mamba_crypto_M_ft96_sl48_ll12_pl256_dm8_nh2_el1_dl256_df1_fctimeF_ebTrue_dtExp_projection_0  
+mse:3.2034494876861572, mae:1.3946441411972046
+
+CryptoTx_96_12_S_Mamba_crypto_M_ft96_sl48_ll12_pl256_dm8_nh2_el1_dl256_df1_fctimeF_ebTrue_dtExp_projection_0  
+mse:1.6377718448638916, mae:0.7638272047042847
+
+CryptoTx_96_12_S_Mamba_crypto_M_ft96_sl48_ll12_pl256_dm8_nh2_el1_dl256_df1_fctimeF_ebTrue_dtExp_projection_0  
+mse:1.637771725654602, mae:0.7638272047042847
+
+CryptoTx_96_12_S_Mamba_crypto_M_ft96_sl48_ll12_pl256_dm8_nh2_el1_dl256_df1_fctimeF_ebTrue_dtExp_projection_0  
+mse:1.6618293523788452, mae:0.7684224843978882
+
