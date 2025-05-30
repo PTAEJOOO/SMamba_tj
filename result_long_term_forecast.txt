@@ -97,3 +97,6 @@ mse:1.651479959487915, mae:0.7783123254776001
 CryptoTx_96_12_RLinear_crypto_M_ft96_sl48_ll12_pl256_dm8_nh2_el1_dl256_df1_fctimeF_ebTrue_dtExp_projection_0  
 mse:2.156339168548584, mae:0.9015905261039734
 
+CryptoTx_96_12_LSTM_crypto_M_ft96_sl48_ll12_pl256_dm8_nh2_el1_dl256_df1_fctimeF_ebTrue_dtExp_projection_0  
+mse:1.5986342430114746, mae:0.7715643644332886
+
