@@ -268,16 +268,16 @@ class Exp_Long_Term_Forecast(Exp_Basic):
                     if test_data.scale and self.args.inverse:
                         shape = input.shape
                         input = test_data.inverse_transform(input.squeeze(0)).reshape(shape)
-                    # gt = np.concatenate((input[0, :, -1], true[0, :, -1]), axis=0)
-                    # pd = np.concatenate((input[0, :, -1], pred[0, :, -1]), axis=0)
-                    # visual(gt, pd, os.path.join(folder_path, str(i) + '.pdf'))
-                    ###################################################################
                     gt = np.concatenate((input[0, :, -1], true[0, :, -1]), axis=0)
                     pd = np.concatenate((input[0, :, -1], pred[0, :, -1]), axis=0)
-                    visual(gt, pd, os.path.join(folder_path, str(i) + '_ethereum.pdf'))
-                    gt = np.concatenate((input[0, :, -2], true[0, :, -2]), axis=0)
-                    pd = np.concatenate((input[0, :, -2], pred[0, :, -2]), axis=0)
-                    visual(gt, pd, os.path.join(folder_path, str(i) + '_bitcoin.pdf'))
+                    visual(gt, pd, os.path.join(folder_path, str(i) + '.pdf'))
+                    ###################################################################
+                    # gt = np.concatenate((input[0, :, -1], true[0, :, -1]), axis=0)
+                    # pd = np.concatenate((input[0, :, -1], pred[0, :, -1]), axis=0)
+                    # visual(gt, pd, os.path.join(folder_path, str(i) + '_bitcoin.pdf'))
+                    # gt = np.concatenate((input[0, :, -2], true[0, :, -2]), axis=0)
+                    # pd = np.concatenate((input[0, :, -2], pred[0, :, -2]), axis=0)
+                    # visual(gt, pd, os.path.join(folder_path, str(i) + '_bitcoin.pdf'))
                     ###################################################################
 
         preds = np.array(preds)

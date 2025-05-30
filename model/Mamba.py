@@ -16,8 +16,7 @@ class Model(nn.Module):
         self.output_attention = configs.output_attention
         self.use_norm = configs.use_norm
         # Embedding
-        self.enc_embedding = DataEmbedding_wo_pos(configs.seq_len, configs.d_model, configs.embed, configs.freq, configs.dropout)
-        # self.enc_embedding = DataEmbedding(self.enc_in, configs.d_model, configs.embed, configs.freq, configs.dropout)
+        self.enc_embedding = DataEmbedding(self.enc_in, configs.d_model, configs.embed, configs.freq, configs.dropout)
         self.class_strategy = configs.class_strategy
         # Encoder-only architecture
         self.encoder = Encoder2(
@@ -59,6 +58,7 @@ class Model(nn.Module):
         # B L E -> B L E  
         # the dimensions of embedded time series has been inverted, and then processed by native attn, layernorm and ffn modules
         enc_out, attns = self.encoder(enc_out, attn_mask=None)
+        # B L E -> 
         # B N E -> B N S -> B S N 
         dec_out = self.projector(enc_out).permute(0, 2, 1)[:, :, :N] # filter the covariates
 
