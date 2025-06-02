@@ -1,0 +1,16 @@
+#!/bin/bash 
+#
+#SBATCH --job-name=fintech_all
+#SBATCH --partition=jobs
+#SBATCH --mem=10gb
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --time=1000:00:00
+#SBATCH --output=/home/taejoo/dsl_lab/SMamba_tj/all.log
+#SBATCH --error=/home/taejoo/dsl_lab/SMamba_tj/all.err
+#SBATCH --nodelist=gpusystem
+#SBATCH --gres=gpu:1
+
+source activate mamba
+
+bash /home/taejoo/dsl_lab/SMamba_tj/scripts/multivariate_forecasting/fintech/all.sh
