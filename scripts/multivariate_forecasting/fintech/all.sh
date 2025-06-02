@@ -1,9 +1,7 @@
-export CUDA_VISIBLE_DEVICES=0
-
 model_name="S_Mamba TimeMachine DLinear RLinear LSTM GRU iTransformer PatchTST" 
 pred_lens="12 24 48 96 192 336"
 
-# d state 2
+CUDA_VISIBLE_DEVICES=3
 for mo in $model_name;do
     for pl in $pred_lens;do
         python run.py \
@@ -21,7 +19,7 @@ for mo in $model_name;do
             --d_model 256 --d_state 2 --d_ff 256 \
             --freq d \
             --batch_size 32 --learning_rate 1e-4 \
-            --patience 10 --gpu 0 \
+            --patience 10 --gpu 3 \
             --revin 1 \
             --ch_ind 1 \
             --residual 1
