@@ -1,7 +1,7 @@
 export CUDA_VISIBLE_DEVICES=0
 
-model_name="S_Mamba TimeMachine DLinear RLinear LSTM iTransformer Autoformer" 
-pred_lens="12 24 48 96 192 336 720"
+model_name="S_Mamba TimeMachine DLinear RLinear LSTM GRU iTransformer PatchTST" 
+pred_lens="12 24 48 96 192 336"
 
 # d state 2
 for mo in $model_name;do
@@ -11,7 +11,7 @@ for mo in $model_name;do
             --root_path ./dataset/CryptoTx/ \
             --data_path bitcoin_ethereum_transactions.csv \
             --data crypto \
-            --model_id CryptoTx_96_12 \
+            --model_id CryptoTx_96 \
             --model $mo \
             --features M \
             --target transactions_ethereum \
