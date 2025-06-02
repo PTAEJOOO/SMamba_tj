@@ -9,7 +9,7 @@ for mo in $model_name;do
         python run.py \
             --is_training 1 \
             --root_path ./dataset/CryptoTx/ \
-            --data_path bitcoin_ethereum_transactions.csv \
+            --data_path bitcoin_ethereum_transactions_log.csv \
             --data crypto \
             --model_id CryptoTx_96 \
             --model $mo \
